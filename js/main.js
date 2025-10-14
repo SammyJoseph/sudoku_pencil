@@ -87,11 +87,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const notesDiv = document.createElement('div');
             notesDiv.className = 'cell-notes hidden';
             const notes = [];
-            for (let i = 0; i < 9; i++) {
-                const note = document.createElement('div');
-                note.className = 'note-item';
-                notesDiv.appendChild(note);
-                notes.push(note);
+            for (let c = 0; c < 3; c++) {
+                const colDiv = document.createElement('div');
+                colDiv.className = 'notes-col';
+                for (let r = 0; r < 3; r++) {
+                    const note = document.createElement('div');
+                    note.className = 'note-item';
+                    colDiv.appendChild(note);
+                    notes.push(note);
+                }
+                notesDiv.appendChild(colDiv);
             }
 
             input.addEventListener('click', () => {
@@ -161,7 +166,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (board[row][col] === '') {
                 const possibles = getPossibleNumbers(row, col);
                 const notesDiv = cell.querySelector('.cell-notes');
-                const notes = notesDiv.querySelectorAll('div');
+                const notes = notesDiv.querySelectorAll('.note-item');
                 notes.forEach(note => note.textContent = '');
                 possibles.forEach(num => {
                     const index = num - 1;
@@ -185,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (board[row][col] === '') {
                     const possibles = getPossibleNumbers(row, col);
                     const notesDiv = cell.querySelector('.cell-notes');
-                    const notes = notesDiv.querySelectorAll('div');
+                    const notes = notesDiv.querySelectorAll('.note-item');
                     notes.forEach(note => note.textContent = '');
                     possibles.forEach(num => {
                         const index = num - 1;

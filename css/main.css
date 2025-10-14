@@ -46,9 +46,8 @@
 .cell-notes {
   position: absolute;
   inset: 0;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 0;
+  display: flex;
+  justify-content: space-around;
   font-size: 8px;
   color: #9ca3af;
   pointer-events: none;
@@ -56,11 +55,19 @@
   overflow: hidden;
 }
 
+.notes-col {
+  display: flex;
+  flex-direction: column;
+  width: 33.33%;
+  height: 100%;
+}
+
 .note-item {
   display: flex;
   align-items: center;
   justify-content: center;
   line-height: 1;
+  height: 33.33%;
 }
 
 .number-button {
