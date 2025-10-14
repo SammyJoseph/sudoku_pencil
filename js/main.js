@@ -6,7 +6,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const infoBtn = document.getElementById('info-btn');
     const infoModal = document.getElementById('info-modal');
     const closeModalBtn = document.getElementById('close-modal');
-    const closeModalBottomBtn = document.getElementById('close-modal-bottom');
+    const menuBtn = document.getElementById('menu-btn');
+    const menuModal = document.getElementById('menu-modal');
+    const closeMenuModalBtn = document.getElementById('close-menu-modal');
     let board = Array(9).fill().map(() => Array(9).fill(''));
     let selectedNumber = 1; // Default to 1
     let notesVisible = false;
@@ -254,7 +256,23 @@ document.addEventListener('DOMContentLoaded', () => {
         highlightSelectedNumber();
     });
 
-    // Modal functionality
+    // Menu Modal functionality
+    menuBtn.addEventListener('click', () => {
+        menuModal.classList.remove('hidden');
+    });
+
+    closeMenuModalBtn.addEventListener('click', () => {
+        menuModal.classList.add('hidden');
+    });
+
+    // Close menu modal when clicking outside
+    menuModal.addEventListener('click', (e) => {
+        if (e.target === menuModal) {
+            menuModal.classList.add('hidden');
+        }
+    });
+
+    // Info Modal functionality
     infoBtn.addEventListener('click', () => {
         infoModal.classList.remove('hidden');
     });
@@ -263,14 +281,43 @@ document.addEventListener('DOMContentLoaded', () => {
         infoModal.classList.add('hidden');
     });
 
-    closeModalBottomBtn.addEventListener('click', () => {
-        infoModal.classList.add('hidden');
-    });
-
-    // Close modal when clicking outside
+    // Close info modal when clicking outside
     infoModal.addEventListener('click', (e) => {
         if (e.target === infoModal) {
             infoModal.classList.add('hidden');
         }
     });
+
+    // Theme toggle functionality
+    const themeLightBtn = document.getElementById('theme-light');
+    const themeDarkBtn = document.getElementById('theme-dark');
+
+    function setTheme(isDark) {
+        if (isDark) {
+            document.documentElement.classList.add('dark');
+            localStorage.setItem('theme', 'dark');
+            // Active dark button
+            themeDarkBtn.classList.add('active-theme');
+            themeLightBtn.classList.remove('active-theme');
+        } else {
+            document.documentElement.classList.remove('dark');
+            localStorage.setItem('theme', 'light');
+            // Active light button
+            themeLightBtn.classList.add('active-theme');
+            themeDarkBtn.classList.remove('active-theme');
+        }
+    }
+
+    themeLightBtn.addEventListener('click', () => {
+        setTheme(false);
+        menuModal.classList.add('hidden');
+    });
+    themeDarkBtn.addEventListener('click', () => {
+        setTheme(true);
+        menuModal.classList.add('hidden');
+    });
+
+    // Load saved theme on startup
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme === 'dark');
 });
