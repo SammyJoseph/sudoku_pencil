@@ -117,6 +117,41 @@
   background-color: #e11d48;
 }
 
+.delete-btn {
+  background-color: white;
+  border: 2px solid #cbd5e1;
+  border-radius: 0.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.delete-btn:not(:disabled) {
+    pointer-events: auto;
+}
+
+.delete-btn.active {
+    opacity: 1;
+}
+
+.delete-btn:not(:disabled):hover {
+  border-color: #cbd5e1;
+}
+
+.delete-btn img {
+  filter: brightness(0.5);
+}
+
+.delete-btn.active img {
+  filter: invert(24%) sepia(96%) saturate(7471%) hue-rotate(210deg) brightness(91%) contrast(101%);
+}
+
 .cell-input.highlighted {
   background-color: #dbeafe;
 }

@@ -1,10 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
     const grid = document.getElementById('sudoku-grid');
     const toggleNotesBtn = document.getElementById('toggle-notes-btn');
+    const deleteNoteBtn = document.getElementById('delete-note-btn');
     const numberButtonsDiv = document.getElementById('number-buttons');
     let board = Array(9).fill().map(() => Array(9).fill(''));
     let selectedNumber = 1; // Default to 1
     let notesVisible = false;
+    let deleteMode = false;
 
     // Create number buttons
     for (let i = 1; i <= 9; i++) {
@@ -100,7 +102,22 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             input.addEventListener('click', () => {
-                if (selectedNumber) {
+                if (deleteMode && notesVisible && board[row][col] === '') {
+                    // Edit mode: toggle the selected number from notes
+                    const notes = notesDiv.querySelectorAll('.note-item');
+                    const noteIndex = selectedNumber - 1;
+                    const targetNote = notes[noteIndex];
+
+                    if (targetNote.textContent === selectedNumber.toString()) {
+                        // Note exists, remove it
+                        targetNote.textContent = '';
+                    } else {
+                        // Note doesn't exist, add it
+                        targetNote.textContent = selectedNumber;
+                    }
+                    // Update highlights after note change
+                    highlightSelectedNumber();
+                } else if (selectedNumber && !deleteMode) {
                     if (board[row][col] === selectedNumber.toString()) {
                         // If clicking the same number, clear the cell
                         input.value = '';
@@ -177,6 +194,16 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Toggle delete mode
+    deleteNoteBtn.addEventListener('click', () => {
+        deleteMode = !deleteMode;
+        if (deleteMode) {
+            deleteNoteBtn.classList.add('active');
+        } else {
+            deleteNoteBtn.classList.remove('active');
+        }
+    });
+
     // Toggle notes
     toggleNotesBtn.addEventListener('click', () => {
         notesVisible = !notesVisible;
@@ -201,6 +228,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             toggleNotesBtn.textContent = 'Hide Notes';
             toggleNotesBtn.classList.add('hide-notes');
+            deleteNoteBtn.disabled = false;
         } else {
             // Hide notes
             cells.forEach(cell => {
@@ -209,6 +237,9 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             toggleNotesBtn.textContent = 'Show Notes';
             toggleNotesBtn.classList.remove('hide-notes');
+            deleteNoteBtn.disabled = true;
+            deleteMode = false;
+            deleteNoteBtn.classList.remove('active');
         }
         // Update highlights after toggling notes
         highlightSelectedNumber();
