@@ -3,10 +3,15 @@ document.addEventListener('DOMContentLoaded', () => {
     const toggleNotesBtn = document.getElementById('toggle-notes-btn');
     const deleteNoteBtn = document.getElementById('delete-note-btn');
     const numberButtonsDiv = document.getElementById('number-buttons');
+    const infoBtn = document.getElementById('info-btn');
+    const infoModal = document.getElementById('info-modal');
+    const closeModalBtn = document.getElementById('close-modal');
+    const closeModalBottomBtn = document.getElementById('close-modal-bottom');
     let board = Array(9).fill().map(() => Array(9).fill(''));
     let selectedNumber = 1; // Default to 1
     let notesVisible = false;
     let deleteMode = false;
+    let deletedNotes = Array(9).fill().map(() => Array(9).fill(new Set()));
 
     // Create number buttons
     for (let i = 1; i <= 9; i++) {
@@ -111,9 +116,11 @@ document.addEventListener('DOMContentLoaded', () => {
                     if (targetNote.textContent === selectedNumber.toString()) {
                         // Note exists, remove it
                         targetNote.textContent = '';
+                        deletedNotes[row][col].add(selectedNumber.toString());
                     } else {
                         // Note doesn't exist, add it
                         targetNote.textContent = selectedNumber;
+                        deletedNotes[row][col].delete(selectedNumber.toString());
                     }
                     // Update highlights after note change
                     highlightSelectedNumber();
@@ -171,7 +178,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        return [1,2,3,4,5,6,7,8,9].filter(num => !used.has(num.toString()));
+        return [1,2,3,4,5,6,7,8,9].filter(num => !used.has(num.toString()) && !deletedNotes[row][col].has(num.toString()));
     }
 
     // Function to update notes for all cells
@@ -226,7 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     notesDiv.classList.remove('hidden');
                 }
             });
-            toggleNotesBtn.textContent = 'Hide Notes';
+            toggleNotesBtn.textContent = 'Ocultar Notas';
             toggleNotesBtn.classList.add('hide-notes');
             deleteNoteBtn.disabled = false;
         } else {
@@ -235,13 +242,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 const notesDiv = cell.querySelector('.cell-notes');
                 notesDiv.classList.add('hidden');
             });
-            toggleNotesBtn.textContent = 'Show Notes';
+            toggleNotesBtn.textContent = 'Ver Notas';
             toggleNotesBtn.classList.remove('hide-notes');
             deleteNoteBtn.disabled = true;
             deleteMode = false;
             deleteNoteBtn.classList.remove('active');
+            // Reset deleted notes when hiding notes
+            deletedNotes = Array(9).fill().map(() => Array(9).fill(new Set()));
         }
         // Update highlights after toggling notes
         highlightSelectedNumber();
+    });
+
+    // Modal functionality
+    infoBtn.addEventListener('click', () => {
+        infoModal.classList.remove('hidden');
+    });
+
+    closeModalBtn.addEventListener('click', () => {
+        infoModal.classList.add('hidden');
+    });
+
+    closeModalBottomBtn.addEventListener('click', () => {
+        infoModal.classList.add('hidden');
+    });
+
+    // Close modal when clicking outside
+    infoModal.addEventListener('click', (e) => {
+        if (e.target === infoModal) {
+            infoModal.classList.add('hidden');
+        }
     });
 });
