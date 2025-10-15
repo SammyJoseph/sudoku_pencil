@@ -212,12 +212,20 @@
   color: #9ca3af;
 }
 
+.delete-btn.active {
+  border-color: #3b82f6;
+}
+
+.dark .delete-btn.active {
+  border-color: #1d4ed8;
+}
+
 .delete-btn.active svg {
   color: #3b82f6;
 }
 
 .dark .delete-btn.active svg {
-  color: #ffffff;
+  color: #1d4ed8;
 }
 
 .cell-input.highlighted {

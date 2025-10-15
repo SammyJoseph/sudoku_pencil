@@ -131,6 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         // If clicking the same number, clear the cell
                         input.value = '';
                         board[row][col] = '';
+                        deletedNotes[row][col].clear();
                         notesDiv.classList.remove('hidden');
                         if (notesVisible) {
                             updateNotes();
@@ -139,6 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Fill or overwrite with selected number
                         input.value = selectedNumber;
                         board[row][col] = selectedNumber.toString();
+                        deletedNotes[row][col].clear();
                         notesDiv.classList.add('hidden');
                         if (notesVisible) {
                             updateNotes();
