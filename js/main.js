@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
     const grid = document.getElementById('sudoku-grid');
     const toggleNotesBtn = document.getElementById('toggle-notes-btn');
-    const deleteNoteBtn = document.getElementById('delete-note-btn');
+    const editNoteBtn = document.getElementById('edit-note-btn');
     const numberButtonsDiv = document.getElementById('number-buttons');
     const infoBtn = document.getElementById('info-btn');
     const infoModal = document.getElementById('info-modal');
@@ -12,8 +12,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let board = Array(9).fill().map(() => Array(9).fill(''));
     let selectedNumber = 1; // Default to 1
     let notesVisible = false;
-    let deleteMode = false;
-    let deletedNotes = Array(9).fill().map(() => Array(9).fill(new Set()));
+    let editMode = false;
+    let manualExcludes = Array(9).fill().map(() => Array(9).fill(new Set()));
+    let manualIncludes = Array(9).fill().map(() => Array(9).fill(new Set()));
 
     // Create number buttons
     for (let i = 1; i <= 9; i++) {
@@ -109,42 +110,50 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             input.addEventListener('click', () => {
-                if (deleteMode && notesVisible && board[row][col] === '') {
+                if (editMode && notesVisible && board[row][col] === '') {
                     // Edit mode: toggle the selected number from notes
                     const notes = notesDiv.querySelectorAll('.note-item');
                     const noteIndex = selectedNumber - 1;
                     const targetNote = notes[noteIndex];
+                    const numStr = selectedNumber.toString();
 
-                    if (targetNote.textContent === selectedNumber.toString()) {
+                    if (targetNote.textContent === numStr) {
                         // Note exists, remove it
                         targetNote.textContent = '';
-                        deletedNotes[row][col].add(selectedNumber.toString());
+                        manualExcludes[row][col].add(numStr);
+                        manualIncludes[row][col].delete(numStr);
                     } else {
                         // Note doesn't exist, add it
-                        targetNote.textContent = selectedNumber;
-                        deletedNotes[row][col].delete(selectedNumber.toString());
+                        targetNote.textContent = numStr;
+                        manualIncludes[row][col].add(numStr);
+                        manualExcludes[row][col].delete(numStr);
                     }
+                    updateCellNotes(row, col);
                     // Update highlights after note change
                     highlightSelectedNumber();
-                } else if (selectedNumber && !deleteMode) {
+                } else if (selectedNumber && !editMode) {
                     if (board[row][col] === selectedNumber.toString()) {
                         // If clicking the same number, clear the cell
                         input.value = '';
                         board[row][col] = '';
-                        deletedNotes[row][col].clear();
+                        manualExcludes[row][col].clear();
+                        manualIncludes[row][col].clear();
                         notesDiv.classList.remove('hidden');
-                        if (notesVisible) {
-                            updateNotes();
-                        }
                     } else {
                         // Fill or overwrite with selected number
                         input.value = selectedNumber;
                         board[row][col] = selectedNumber.toString();
-                        deletedNotes[row][col].clear();
+                        manualExcludes[row][col].clear();
+                        manualIncludes[row][col].clear();
                         notesDiv.classList.add('hidden');
-                        if (notesVisible) {
-                            updateNotes();
-                        }
+                    }
+
+                    if (notesVisible) {
+                        const affected = getAffectedCells(row, col);
+                        affected.forEach(key => {
+                            const [i, j] = key.split('-').map(Number);
+                            updateCellNotes(i, j);
+                        });
                     }
                     // Update highlights after cell change
                     highlightSelectedNumber();
@@ -157,8 +166,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Function to get possible numbers for a cell
-    function getPossibleNumbers(row, col) {
+    // Function to get display notes for a cell
+    function getDisplayNotes(row, col) {
         if (board[row][col] !== '') return [];
 
         const used = new Set();
@@ -182,36 +191,78 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         }
 
-        return [1,2,3,4,5,6,7,8,9].filter(num => !used.has(num.toString()) && !deletedNotes[row][col].has(num.toString()));
-    }
+        let possibles = [1,2,3,4,5,6,7,8,9].filter(num => !used.has(num.toString()));
+        let displayNums = new Set(possibles);
 
-    // Function to update notes for all cells
-    function updateNotes() {
-        const cells = grid.querySelectorAll('div[data-row]');
-        cells.forEach(cell => {
-            const row = parseInt(cell.dataset.row);
-            const col = parseInt(cell.dataset.col);
-            if (board[row][col] === '') {
-                const possibles = getPossibleNumbers(row, col);
-                const notesDiv = cell.querySelector('.cell-notes');
-                const notes = notesDiv.querySelectorAll('.note-item');
-                notes.forEach(note => note.textContent = '');
-                possibles.forEach(num => {
-                    const index = num - 1;
-                    notes[index].textContent = num;
-                });
-                notesDiv.classList.remove('hidden');
-            }
+        manualIncludes[row][col].forEach(strNum => {
+            displayNums.add(parseInt(strNum));
         });
+
+        manualExcludes[row][col].forEach(strNum => {
+            displayNums.delete(parseInt(strNum));
+        });
+
+        return Array.from(displayNums).sort((a, b) => a - b);
     }
 
-    // Toggle delete mode
-    deleteNoteBtn.addEventListener('click', () => {
-        deleteMode = !deleteMode;
-        if (deleteMode) {
-            deleteNoteBtn.classList.add('active');
+    function getAffectedCells(r, c) {
+        const affected = new Set();
+        // row
+        for (let j = 0; j < 9; j++) {
+            if (board[r][j] === '') {
+                affected.add(`${r}-${j}`);
+            }
+        }
+        // column
+        for (let i = 0; i < 9; i++) {
+            if (board[i][c] === '') {
+                affected.add(`${i}-${c}`);
+            }
+        }
+        // box
+        const br = Math.floor(r / 3) * 3;
+        const bc = Math.floor(c / 3) * 3;
+        for (let i = br; i < br + 3; i++) {
+            for (let j = bc; j < bc + 3; j++) {
+                if (board[i][j] === '') {
+                    affected.add(`${i}-${j}`);
+                }
+            }
+        }
+        return affected;
+    }
+
+    function updateCellNotes(row, col) {
+        const cell = grid.querySelector(`[data-row="${row}"][data-col="${col}"]`);
+        if (!cell) return;
+        const notesDiv = cell.querySelector('.cell-notes');
+        if (!notesDiv) return;
+        const notes = notesDiv.querySelectorAll('.note-item');
+        notes.forEach(note => note.textContent = '');
+        if (board[row][col] === '') {
+            const possibles = getDisplayNotes(row, col);
+            possibles.forEach(num => {
+                const index = num - 1;
+                notes[index].textContent = num;
+            });
+            if (notesVisible) {
+                notesDiv.classList.remove('hidden');
+            } else {
+                notesDiv.classList.add('hidden');
+            }
         } else {
-            deleteNoteBtn.classList.remove('active');
+            notesDiv.classList.add('hidden');
+        }
+    }
+
+
+    // Toggle edit mode
+    editNoteBtn.addEventListener('click', () => {
+        editMode = !editMode;
+        if (editMode) {
+            editNoteBtn.classList.add('active');
+        } else {
+            editNoteBtn.classList.remove('active');
         }
     });
 
@@ -226,20 +277,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 const row = parseInt(cell.dataset.row);
                 const col = parseInt(cell.dataset.col);
                 if (board[row][col] === '') {
-                    const possibles = getPossibleNumbers(row, col);
-                    const notesDiv = cell.querySelector('.cell-notes');
-                    const notes = notesDiv.querySelectorAll('.note-item');
-                    notes.forEach(note => note.textContent = '');
-                    possibles.forEach(num => {
-                        const index = num - 1;
-                        notes[index].textContent = num;
-                    });
-                    notesDiv.classList.remove('hidden');
+                    updateCellNotes(row, col);
                 }
             });
             toggleNotesBtn.textContent = 'Ocultar Notas';
             toggleNotesBtn.classList.add('hide-notes');
-            deleteNoteBtn.disabled = false;
+            editNoteBtn.disabled = false;
         } else {
             // Hide notes
             cells.forEach(cell => {
@@ -248,11 +291,12 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             toggleNotesBtn.textContent = 'Ver Notas';
             toggleNotesBtn.classList.remove('hide-notes');
-            deleteNoteBtn.disabled = true;
-            deleteMode = false;
-            deleteNoteBtn.classList.remove('active');
-            // Reset deleted notes when hiding notes
-            deletedNotes = Array(9).fill().map(() => Array(9).fill(new Set()));
+            editNoteBtn.disabled = true;
+            editMode = false;
+            editNoteBtn.classList.remove('active');
+            // Reset manual notes when hiding notes
+            manualExcludes = Array(9).fill().map(() => Array(9).fill(new Set()));
+            manualIncludes = Array(9).fill().map(() => Array(9).fill(new Set()));
         }
         // Update highlights after toggling notes
         highlightSelectedNumber();

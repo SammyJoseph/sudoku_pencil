@@ -172,68 +172,68 @@
   background-color: #dc2626;
 }
 
-.delete-btn {
-  background-color: white;
-  border: 2px solid #cbd5e1;
-  border-radius: 0.5rem;
-  width: 2.5rem;
-  height: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all 0.2s;
-  opacity: 0.5;
-  pointer-events: none;
+.edit-btn {
+    background-color: white;
+    border: 2px solid #cbd5e1;
+    border-radius: 0.5rem;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    opacity: 0.5;
+    pointer-events: none;
 }
 
-.dark .delete-btn {
-  background-color: #1f2937;
-  border-color: #4b5563;
+.dark .edit-btn {
+    background-color: #1f2937;
+    border-color: #4b5563;
 }
 
-.delete-btn:not(:disabled) {
+.edit-btn:not(:disabled) {
     pointer-events: auto;
 }
 
-.delete-btn.active {
+.edit-btn.active {
     opacity: 1;
 }
 
-.delete-btn:not(:disabled):hover {
-  border-color: #cbd5e1;
+.edit-btn:not(:disabled):hover {
+    border-color: #cbd5e1;
 }
 
-.delete-btn svg {
-  color: #6b7280;
+.edit-btn svg {
+    color: #6b7280;
 }
 
-.dark .delete-btn svg {
-  color: #9ca3af;
+.dark .edit-btn svg {
+    color: #9ca3af;
 }
 
-.delete-btn.active {
+.edit-btn.active {
     border-color: #3b82f6;
 }
 
-.delete-btn.active:focus {
+.edit-btn.active:focus {
     border-color: #3b82f6;
 }
 
-.dark .delete-btn.active {
+.dark .edit-btn.active {
     border-color: #1d4ed8;
 }
 
-.dark .delete-btn.active:focus {
+.dark .edit-btn.active:focus {
     border-color: #1d4ed8;
 }
 
-.delete-btn.active svg {
-  color: #3b82f6;
+.edit-btn.active svg {
+    color: #3b82f6;
 }
 
-.dark .delete-btn.active svg {
-  color: #1d4ed8;
+.dark .edit-btn.active svg {
+    color: #1d4ed8;
 }
 
 .cell-input.highlighted {
