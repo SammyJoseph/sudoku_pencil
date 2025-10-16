@@ -14,6 +14,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedNumber = 1; // Default to 1
     let notesVisible = false;
     let editMode = false;
+    let solutionMode = false;
+    let solvedBoard = null;
 
     function createManualSets() {
         return Array.from({length: 9}, () => Array.from({length: 9}, () => new Set()));
@@ -135,20 +137,52 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Update highlights after note change
                     highlightSelectedNumber();
                 } else if (selectedNumber && !editMode) {
-                    if (board[row][col] === selectedNumber.toString()) {
-                        // If clicking the same number, clear the cell
-                        input.value = '';
-                        board[row][col] = '';
-                        manualExcludes[row][col].clear();
-                        manualIncludes[row][col].clear();
-                        notesDiv.classList.remove('hidden');
+                    if (solutionMode) {
+                        // In solution mode, validate against solved board
+                        const correctNumber = solvedBoard[row][col];
+                        if (selectedNumber.toString() === correctNumber) {
+                            // Correct number - proceed normally
+                            if (board[row][col] === selectedNumber.toString()) {
+                                // If clicking the same number, clear the cell
+                                input.value = '';
+                                board[row][col] = '';
+                                manualExcludes[row][col].clear();
+                                manualIncludes[row][col].clear();
+                                notesDiv.classList.remove('hidden');
+                            } else {
+                                // Fill with correct number
+                                input.value = selectedNumber;
+                                board[row][col] = selectedNumber.toString();
+                                manualExcludes[row][col].clear();
+                                manualIncludes[row][col].clear();
+                                notesDiv.classList.add('hidden');
+                            }
+                        } else {
+                            // Incorrect number - flash red border
+                            const cell = input.closest('.sudoku-cell');
+                            cell.classList.add('incorrect-flash');
+                            setTimeout(() => {
+                                cell.classList.remove('incorrect-flash');
+                            }, 500);
+                            return; // Don't proceed with the input
+                        }
                     } else {
-                        // Fill or overwrite with selected number
-                        input.value = selectedNumber;
-                        board[row][col] = selectedNumber.toString();
-                        manualExcludes[row][col].clear();
-                        manualIncludes[row][col].clear();
-                        notesDiv.classList.add('hidden');
+                        // Normal mode - no validation
+                        if (board[row][col] === selectedNumber.toString()) {
+                            // If clicking the same number, clear the cell
+                            input.value = '';
+                            board[row][col] = '';
+                            manualExcludes[row][col].clear();
+                            manualIncludes[row][col].clear();
+                            notesDiv.classList.remove('hidden');
+                        } else {
+                            // Fill or overwrite with selected number
+                            input.value = selectedNumber;
+                            board[row][col] = selectedNumber.toString();
+                            manualExcludes[row][col].clear();
+                            manualIncludes[row][col].clear();
+                            notesDiv.classList.add('hidden');
+                        }
                     }
 
                     if (notesVisible) {
@@ -373,8 +407,23 @@ document.addEventListener('DOMContentLoaded', () => {
     // Solve toggle functionality
     solveToggle.addEventListener('change', () => {
         if (solveToggle.checked) {
-            // Call the solver
-            window.solveSudoku(board);
+            // Validate the puzzle before activating solution mode
+            const result = window.solveSudoku(board);
+            if (result.status === 'unique_solution') {
+                solutionMode = true;
+                solvedBoard = result.board;
+                // Keep the toggle checked
+            } else if (result.status === 'no_solution') {
+                alert('Este sudoku no tiene solución. Por favor, verifica los números ingresados.');
+                solveToggle.checked = false;
+            } else if (result.status === 'multiple_solutions') {
+                alert('Este sudoku tiene múltiples soluciones. Por favor, verifica los números ingresados.');
+                solveToggle.checked = false;
+            }
+        } else {
+            // Deactivate solution mode
+            solutionMode = false;
+            solvedBoard = null;
         }
     });
 });

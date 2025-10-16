@@ -67,11 +67,40 @@ function solveSudoku(initialBoard) {
 
     if (solutionCount.count === 0) {
         console.log('No solution found for the Sudoku puzzle.');
+        return { status: 'no_solution', board: null };
     } else if (solutionCount.count === 1) {
-        console.table(solutionCount.board);
+        printBoardWithBoxes(solutionCount.board);
+        return { status: 'unique_solution', board: solutionCount.board };
     } else {
         console.log('Multiple solutions found for the Sudoku puzzle.');
+        return { status: 'multiple_solutions', board: null };
     }
+}
+
+function printBoardWithBoxes(board) {
+    console.log('┌─────────┬─────────┬─────────┐');
+    for (let row = 0; row < 9; row++) {
+        let rowStr = '│';
+        for (let col = 0; col < 9; col++) {
+            const boxIndex = Math.floor(row / 3) * 3 + Math.floor(col / 3);
+            const isAlternateBox = (boxIndex % 2 === 1);
+            const num = board[row][col] || ' ';
+            if (isAlternateBox) {
+                rowStr += `\x1b[47m\x1b[30m ${num} \x1b[0m`; // White background, black text
+            } else {
+                rowStr += ` ${num} `;
+            }
+            if ((col + 1) % 3 === 0 && col < 8) {
+                rowStr += '│';
+            }
+        }
+        rowStr += '│';
+        console.log(rowStr);
+        if ((row + 1) % 3 === 0 && row < 8) {
+            console.log('├─────────┼─────────┼─────────┤');
+        }
+    }
+    console.log('└─────────┴─────────┴─────────┘');
 }
 
 // Export the function for use in main.js

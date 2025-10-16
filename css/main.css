@@ -330,3 +330,42 @@
 .active-theme:hover {
   background-color: #2563eb;
 }
+
+/* Incorrect flash animation */
+.incorrect-flash {
+  animation: flash-red 0.5s ease-in-out;
+}
+
+@keyframes flash-red {
+  0% {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 2px #ef4444;
+  }
+  50% {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.5);
+  }
+  100% {
+    border-color: #cbd5e1;
+    box-shadow: none;
+  }
+}
+
+.dark .incorrect-flash {
+  animation: flash-red-dark 0.5s ease-in-out;
+}
+
+@keyframes flash-red-dark {
+  0% {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 2px #ef4444;
+  }
+  50% {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 4px rgba(239, 68, 68, 0.5);
+  }
+  100% {
+    border-color: #4b5563;
+    box-shadow: none;
+  }
+}
