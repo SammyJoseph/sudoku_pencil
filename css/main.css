@@ -66,6 +66,8 @@
   background: transparent;
   z-index: 10;
   color: #1f2937;
+  font-size: 1.3rem;
+  font-weight: 500;;
 }
 
 .dark .cell-input {
@@ -76,7 +78,7 @@
   position: absolute;
   inset: 0;
   display: flex;
-  justify-content: space-around;
+  flex-direction: column;
   font-size: 8px;
   color: #9ca3af;
   pointer-events: none;
@@ -88,11 +90,11 @@
   color: #9ca3af;
 }
 
-.notes-col {
+.notes-row {
   display: flex;
-  flex-direction: column;
-  width: 33.33%;
-  height: 100%;
+  flex-direction: row;
+  height: 33.33%;
+  width: 100%;
 }
 
 .note-item {
@@ -100,7 +102,8 @@
   align-items: center;
   justify-content: center;
   line-height: 1;
-  height: 33.33%;
+  width: 33.33%;
+  height: 100%;
 }
 
 .number-button {
@@ -108,8 +111,8 @@
   color: #1f2937;
   font-weight: bold;
   border-radius: 0.25rem;
-  width: 2rem;
-  height: 2rem;
+  width: 2.5rem;
+  height: 2.5rem;
   display: flex;
   align-items: center;
   justify-content: center;

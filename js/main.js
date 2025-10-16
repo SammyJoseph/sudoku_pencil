@@ -13,9 +13,13 @@ document.addEventListener('DOMContentLoaded', () => {
     let selectedNumber = 1; // Default to 1
     let notesVisible = false;
     let editMode = false;
-    let manualExcludes = Array(9).fill().map(() => Array(9).fill(new Set()));
-    let manualIncludes = Array(9).fill().map(() => Array(9).fill(new Set()));
 
+    function createManualSets() {
+        return Array.from({length: 9}, () => Array.from({length: 9}, () => new Set()));
+    }
+
+    let manualExcludes = createManualSets();
+    let manualIncludes = createManualSets();
     // Create number buttons
     for (let i = 1; i <= 9; i++) {
         const btn = document.createElement('button');
@@ -97,16 +101,16 @@ document.addEventListener('DOMContentLoaded', () => {
             const notesDiv = document.createElement('div');
             notesDiv.className = 'cell-notes hidden';
             const notes = [];
-            for (let c = 0; c < 3; c++) {
-                const colDiv = document.createElement('div');
-                colDiv.className = 'notes-col';
-                for (let r = 0; r < 3; r++) {
+            for (let r = 0; r < 3; r++) {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'notes-row';
+                for (let c = 0; c < 3; c++) {
                     const note = document.createElement('div');
                     note.className = 'note-item';
-                    colDiv.appendChild(note);
+                    rowDiv.appendChild(note);
                     notes.push(note);
                 }
-                notesDiv.appendChild(colDiv);
+                notesDiv.appendChild(rowDiv);
             }
 
             input.addEventListener('click', () => {
@@ -119,12 +123,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     if (targetNote.textContent === numStr) {
                         // Note exists, remove it
-                        targetNote.textContent = '';
                         manualExcludes[row][col].add(numStr);
                         manualIncludes[row][col].delete(numStr);
                     } else {
                         // Note doesn't exist, add it
-                        targetNote.textContent = numStr;
                         manualIncludes[row][col].add(numStr);
                         manualExcludes[row][col].delete(numStr);
                     }
@@ -295,8 +297,8 @@ document.addEventListener('DOMContentLoaded', () => {
             editMode = false;
             editNoteBtn.classList.remove('active');
             // Reset manual notes when hiding notes
-            manualExcludes = Array(9).fill().map(() => Array(9).fill(new Set()));
-            manualIncludes = Array(9).fill().map(() => Array(9).fill(new Set()));
+            manualExcludes = createManualSets();
+            manualIncludes = createManualSets();
         }
         // Update highlights after toggling notes
         highlightSelectedNumber();
