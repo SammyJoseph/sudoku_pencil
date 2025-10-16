@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const menuBtn = document.getElementById('menu-btn');
     const menuModal = document.getElementById('menu-modal');
     const closeMenuModalBtn = document.getElementById('close-menu-modal');
+    const solveToggle = document.getElementById('solve-toggle');
     let board = Array(9).fill().map(() => Array(9).fill(''));
     let selectedNumber = 1; // Default to 1
     let notesVisible = false;
@@ -368,4 +369,12 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load saved theme on startup
     const savedTheme = localStorage.getItem('theme') || 'light';
     setTheme(savedTheme === 'dark');
+
+    // Solve toggle functionality
+    solveToggle.addEventListener('change', () => {
+        if (solveToggle.checked) {
+            // Call the solver
+            window.solveSudoku(board);
+        }
+    });
 });
